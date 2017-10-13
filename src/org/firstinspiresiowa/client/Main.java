@@ -42,6 +42,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Main http = new Main();
         
+        Server server = new Server("https://firstinspiresiowa.firebaseapp.com");
+        
         File matchDetailsFile = new File("MatchResultsDetails_North_Super_Regional_Kindig.html");
         File teamInfoFile = new File("TeamInfo_North_Super_Regional_Kindig.html");
         File rankingsFile = new File("Rankings_North_Super_Regional_Kindig.html");
@@ -64,15 +66,24 @@ public class Main {
             teams.add(new Team(row));
         }
         
+        
+        String matchlist = "{\"matches\":[";
         for (Match m: matches) {
-            http.sendPost(m.BuildJson());
+            matchlist += m.BuildJson() + ",";
         }
+        matchlist = matchlist.substring(0,matchlist.length()-1);
+        matchlist += "]}";
+        server.Post(matchlist, "/matches");
         
+        
+        String teamlist = "{\"teams\":[";
         for (Team t: teams) {
-            http.sendPost(t.BuildJson());
+            teamlist += t.BuildJson() + ",";
         }
-        
-        //http.sendGet();
+        teamlist = teamlist.substring(0,teamlist.length()-1);
+        teamlist += "]}";
+        //System.out.println(teamlist);
+        server.Post(teamlist, "/teams");
     }
     
     

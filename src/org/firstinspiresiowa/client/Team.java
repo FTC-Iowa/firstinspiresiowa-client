@@ -32,14 +32,15 @@ public class Team {
     }
     
     
-    public String BuildJson() {
+    public String BuildJson() 
+    {
         String j = "{";
         j += "\"number\":\"" + number + "\",";
-        j += "\"name\":\""+ name +"\",";
+        j += "\"teamname\":\""+ name +"\",";
         j += "\"school\":\""+ school +"\",";
-        j += "\"city\":" + city + ",";
-        j += "\"state\":" + state + ",";
-        j += "\"country\":" + country;
+        j += "\"city\":\"" + city + "\",";
+        j += "\"state\":\"" + state + "\",";
+        j += "\"country\":\"" + country + "\"";
         j += "}";
         return j;
     }
