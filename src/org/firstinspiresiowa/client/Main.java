@@ -5,14 +5,10 @@
  */
 package org.firstinspiresiowa.client;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.InputStreamReader;
-
-import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import javax.net.ssl.HttpsURLConnection;
+import javax.swing.JFileChooser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.*;
 import org.jsoup.select.*;
@@ -22,24 +18,36 @@ import org.jsoup.select.*;
  * @author vens
  */
 public class Main {
-    private final String USER_AGENT = "Mozilla/5.0";
+    //private final String USER_AGENT = "Mozilla/5.0";
 
 
     
-    Element getTable(File f) throws Exception{
-        Document doc = Jsoup.parse(f, "UTF-8", "");
-        Elements tables = doc.getElementsByTag("table");
-        if (tables.isEmpty()) {
-            System.err.println("Could not find table in HTML document");
-            throw new Exception();
-        }
-        return tables.first();
-    }
+    
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
+        
+        JFileChooser fc = new JFileChooser();
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fc.setDialogTitle("Score System Directory");
+        int rv = fc.showDialog(null, "Select");
+        
+        Path scoreSystemPath;
+        if (rv == JFileChooser.APPROVE_OPTION) {
+            scoreSystemPath = fc.getSelectedFile().toPath();
+        } else {
+            System.err.println("Failed to open score system directory");
+            return;
+        }
+        
+        ReportsDirectory reportsDir = new ReportsDirectory(scoreSystemPath);
+        reportsDir.proccessEvents();
+        
+        /*
+        if(true)return;
+        
         Main http = new Main();
         
         Server server = new Server("https://firstinspiresiowa.firebaseapp.com");
@@ -59,12 +67,7 @@ public class Main {
             matches.add(new Match(row, i - 1, "kindig"));
         }
         
-        Elements teamInfoRows = teamInfoTable.getElementsByTag("tr");
-        ArrayList<Team> teams = new ArrayList<Team>();
-        for(int i = 1; i< teamInfoRows.size(); i++) {
-            Element row = teamInfoRows.get(i);
-            teams.add(new Team(row));
-        }
+        
         
         
         String matchlist = "{\"matches\":[";
@@ -84,11 +87,12 @@ public class Main {
         teamlist += "]}";
         //System.out.println(teamlist);
         server.Post(teamlist, "/teams");
+    */
     }
     
     
     // HTTP GET request
-	private void sendGet() throws Exception {
+	/*private void sendGet() throws Exception {
 
 		String url = "https://firstinspiresiowa.firebaseapp.com/event/davenport";
                 //String url = "http://localhost:5000/event/davenport";
@@ -119,10 +123,10 @@ public class Main {
 		//print result
 		System.out.println(response.toString());
 
-	}
+	}*/
 
 	// HTTP POST request
-	private void sendPost(String data) throws Exception {
+	/*private void sendPost(String data) throws Exception {
 
 		String url = "https://firstinspiresiowa.firebaseapp.com/event/davenport";
                 //String url = "http://localhost:5000/event/davenport";
@@ -163,6 +167,6 @@ public class Main {
 		//print result
 		System.out.println(response.toString());
 
-	}
+	}*/
     
 }
