@@ -14,8 +14,9 @@ import org.jsoup.select.Elements;
  *
  * @author vens
  */
-public class TeamInfoFile extends ReportFile {
+public class TeamInfoFile extends ReportFile implements JsonAble {
     private final ArrayList<Team> teams;
+    //public CollisionManager(ArrayList<? extends JsonAble>) teams;
     
     public TeamInfoFile(File _file) throws Exception{
         super(_file);
@@ -28,15 +29,20 @@ public class TeamInfoFile extends ReportFile {
         Elements teamInfoRows = teamInfoTable.getElementsByTag("tr");
         for(int i = 1; i< teamInfoRows.size(); i++) {
             Element row = teamInfoRows.get(i);
-            teams.add(i - 1, new Team(row));
+            Team t = new Team(row);
+            teams.add(i - 1, t);
+            System.out.println("Found team: " + t);
         }
     }
+    
+    
     
     /**
      * Called whenever the file changes on the disk
      * @return A list of teams that have changed between the disk and ram versions of the file.
      * @throws Exception 
      */
+    @Override
     public ArrayList<JsonAble> onFileChange()  throws Exception{
         Element teamInfoTable = this.getHtmlTable();
         Elements teamInfoRows = teamInfoTable.getElementsByTag("tr");
@@ -44,7 +50,7 @@ public class TeamInfoFile extends ReportFile {
         for(int i = 1; i< teamInfoRows.size(); i++) {
             Element row = teamInfoRows.get(i);
             Team t = new Team(row);
-            if(t == teams.get(i-1)) {
+            if(!t.equals(teams.get(i-1))) {
                 System.out.println("Team " + t.toString() + " changed.");
                 teams.set(i-1, t);
                 ret.add(t);
@@ -52,4 +58,9 @@ public class TeamInfoFile extends ReportFile {
         }
         return ret;
     }
+
+    @Override
+    public String buildJson() {
+        return JsonAble.buildJsonArray("teams", teams);
+    }    
 }
