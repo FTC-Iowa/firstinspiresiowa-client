@@ -7,6 +7,8 @@ package org.firstinspiresiowa.client;
 
 import java.io.File;
 import java.util.ArrayList;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -16,6 +18,7 @@ import org.jsoup.select.Elements;
  */
 public class TeamInfoFile extends ReportFile {
     private final ArrayList<Team> teams;
+    //public CollisionManager(ArrayList<? extends JsonAble>) teams;
     
     public TeamInfoFile(File _file) throws Exception{
         super(_file);
@@ -28,8 +31,14 @@ public class TeamInfoFile extends ReportFile {
         Elements teamInfoRows = teamInfoTable.getElementsByTag("tr");
         for(int i = 1; i< teamInfoRows.size(); i++) {
             Element row = teamInfoRows.get(i);
-            teams.add(i - 1, new Team(row));
+            Team t = new Team(row);
+            teams.add(i - 1, t);
+            System.out.println("Found team: " + t);
         }
+    }
+    
+    public ArrayList<Team> getTeamList() {
+        return teams;
     }
     
     /**
@@ -37,14 +46,15 @@ public class TeamInfoFile extends ReportFile {
      * @return A list of teams that have changed between the disk and ram versions of the file.
      * @throws Exception 
      */
-    public ArrayList<JsonAble> onFileChange()  throws Exception{
+    @Override
+    public ArrayList<Jsonable> onFileChange()  throws Exception{
         Element teamInfoTable = this.getHtmlTable();
         Elements teamInfoRows = teamInfoTable.getElementsByTag("tr");
-        ArrayList<JsonAble> ret = new ArrayList<>();
+        ArrayList<Jsonable> ret = new ArrayList<>();
         for(int i = 1; i< teamInfoRows.size(); i++) {
             Element row = teamInfoRows.get(i);
             Team t = new Team(row);
-            if(t == teams.get(i-1)) {
+            if(!t.equals(teams.get(i-1))) {
                 System.out.println("Team " + t.toString() + " changed.");
                 teams.set(i-1, t);
                 ret.add(t);

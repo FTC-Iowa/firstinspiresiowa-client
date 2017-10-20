@@ -5,6 +5,7 @@
  */
 package org.firstinspiresiowa.client;
 
+import org.json.simple.*;
 import org.jsoup.nodes.*;
 import org.jsoup.select.*;
 
@@ -12,8 +13,8 @@ import org.jsoup.select.*;
  *
  * @author vens
  */
-public class Match implements JsonAble {
-    private class Aliance implements JsonAble{
+public class Match implements Jsonable{
+    private class Aliance implements Jsonable{
         public int team1;
         public int team2;
         public int team3 = 0;
@@ -38,30 +39,35 @@ public class Match implements JsonAble {
             }
             return false;
         }
+
         
         @Override
-        public String BuildJson() {
-            String j = "{";
-            j += "\"teams\": [\"" + team1 + "\",\"" + team2 + (team3>0 ? "\",\"" + team3 : "") +"\"],";
-            j += "\"auto\":\"" + auto + "\",";
-            j += "\"auto_b\":\"" + auto_b + "\",";
-            j += "\"end_game\":\"" + end_game + "\",";
-            j += "\"penalty\":\"" + penalty + "\",";
-            j += "\"tele_op\":\"" + tele_op + "\",";
-            j += "\"total\":\"" + total + "\"";
-            j += "}";
-            return j;
+        public JSONObject toJson() {
+            JSONObject json = new JSONObject();
+            JSONArray teams = new JSONArray();
+            teams.add(team1);
+            teams.add(team2);
+            if(team3 > 0)
+                teams.add(team3);
+            json.put("teams", teams);
+            json.put("auto", auto);
+            json.put("auto_b", auto_b);
+            json.put("end_game", end_game);
+            json.put("penalty", penalty);
+            json.put("tele_op", tele_op);
+            json.put("total", total);
+            return json;
         }
     }
-    private int number;
-    private String name;
-    private String event_ref;
-    private Aliance red = new Aliance();
-    private Aliance blue = new Aliance();
+    private final int number;
+    private final String name;
+    //private final String event_ref;
+    private final Aliance red = new Aliance();
+    private final Aliance blue = new Aliance();
     
     //<TR ALIGN=CENTER><TD BGCOLOR="#FFFFFF">Q-1</TD><TD BGCOLOR="#FF4444">140-0 R</TD><TD BGCOLOR="#FFFFFF"></TD><TD BGCOLOR="#FFFFFF"></TD><TD BGCOLOR="#FFFFFF">140</TD><TD BGCOLOR="#FFFFFF">90</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">30</TD><TD BGCOLOR="#FFFFFF">20</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD></TR>
     
-    public Match(Element row, int _number, String _event_ref){
+    public Match(Element row, int _number){
         
         Elements cols = row.getElementsByTag("td");
         //System.out.println(cols.size());
@@ -79,7 +85,7 @@ public class Match implements JsonAble {
             red.team3 = Integer.parseInt(blue_teams[2]);
         
         name = cols.get(0).text();
-        event_ref = _event_ref;
+        //event_ref = _event_ref;
         System.out.println(cols.get(5).text());
         red.auto = Integer.parseInt(cols.get(5).text());
         red.auto_b = Integer.parseInt(cols.get(6).text());
@@ -98,7 +104,7 @@ public class Match implements JsonAble {
     public boolean equals(Match m) {
         if (number == m.number &&
                 name.compareTo(m.name) == 0 &&
-                event_ref.compareTo(m.event_ref) == 0 &&
+                //event_ref.compareTo(m.event_ref) == 0 &&
                 red.equals(m.red) &&
                 blue.equals(m.blue)) {
             return true;
@@ -107,16 +113,12 @@ public class Match implements JsonAble {
     }
     
     @Override
-    public String BuildJson() {
-        String j = "{";
-        j += "\"number\":\"" + number + "\",";
-        j += "\"name\":\""+ name +"\",";
-        j += "\"event\":\""+ event_ref +"\",";
-        j += "\"red\":" + red.BuildJson() + ",";
-        j += "\"blue\":" + blue.BuildJson();
-        j += "}";
-        return j;
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("number", number);
+        json.put("name", name);
+        json.put("red", red.toJson());
+        json.put("blue", blue.toJson());
+        return json;
     }
-    
-    
 }

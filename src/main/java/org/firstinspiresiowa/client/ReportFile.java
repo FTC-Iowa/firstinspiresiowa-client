@@ -33,7 +33,7 @@ public abstract class ReportFile {
         return tables.first();
     }
     
-    public abstract ArrayList<JsonAble> onFileChange() throws Exception;
+    public abstract ArrayList<Jsonable> onFileChange() throws Exception;
     
     // report Files:
     //     MatchResultsDetails, Matches, Rankings, TeamInfo
