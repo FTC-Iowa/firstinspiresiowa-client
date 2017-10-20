@@ -26,7 +26,7 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
         config = new Config("firstinspiresiowa_conf.json");
-        if(true)return;
+        //if(true)return;
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fc.setDialogTitle("Score System Directory");
@@ -41,7 +41,7 @@ public class Main {
         }
         
         ReportsDirectory reportsDir = new ReportsDirectory(scoreSystemPath);
-        //reportsDir.proccessEvents();
+        reportsDir.proccessEvents();
         
         
         File teamInfo = new File("/home/vens/Projects/firstinspiresiowa-client/TeamInfo_North_Super_Regional_Kindig.html");

@@ -15,9 +15,17 @@ import java.util.Map;
  *
  * @author vens
  */
-public class ReportsDirectory {
+class ReportsDirectory {
     private final WatchService watcher;
     private final Map<WatchKey,Path> keys;
+    
+    public TeamInfoFile teamInfoFile = null;
+    public MatchesFile matchesFile = null;
+    public MatchResultsDetailsFile matchResultsDetailsFile = null;
+    public RankingsFile rankingsFile = null;
+    
+    private Path reportsDir;
+    
     
     static <T> WatchEvent<T> cast(WatchEvent<?> event) {
         return (WatchEvent<T>)event;
@@ -31,7 +39,7 @@ public class ReportsDirectory {
     public ReportsDirectory (Path dir) throws IOException {
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<WatchKey,Path>();
-        
+        this.reportsDir = dir;
         register(dir);
     }
     
@@ -54,6 +62,7 @@ public class ReportsDirectory {
                 WatchEvent.Kind kind = event.kind();
                 
                 if (kind == OVERFLOW) {
+                    System.err.println("OVERFLOW event detected");
                     continue;
                 }
                 
