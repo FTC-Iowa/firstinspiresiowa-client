@@ -12,14 +12,14 @@ import org.jsoup.select.Elements;
  *
  * @author vens
  */
-public class Team extends JsonAble{
-    private final int number;
-    private final String name;
-    private final String school;
-    private final String city;
-    private final String state;
-    private final String country;
-    private final int hash;
+public class Team implements JsonAble{
+    private int number;
+    private String name;
+    private String school;
+    private String city;
+    private String state;
+    private String country;
+    private int hash;
     
     public Team(Element row){
         Elements cols = row.getElementsByTag("td");
@@ -33,33 +33,24 @@ public class Team extends JsonAble{
         hash = tmp.hashCode();
     }
     
-    @Override
     public String toString() {
         return "" + number + " (" + name + ")";
     }
     
-    @Override
     public int hashCode(){
         return hash;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
+    
+    public boolean equals(Team a) {
+            if (hashCode() == a.hashCode()) {
+                return true;      
+            } else {
+                return false;
+            }
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Team other = (Team) obj;
-        return this.hash == other.hash;
-    }
     
     @Override
-    public String buildJson() 
+    public String BuildJson() 
     {
         String j = "{";
         j += "\"number\":\"" + number + "\",";

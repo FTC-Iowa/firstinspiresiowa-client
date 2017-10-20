@@ -6,23 +6,28 @@
 package org.firstinspiresiowa.client;
 
 import java.io.File;
-import static java.lang.Thread.sleep;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.*;
+import org.jsoup.select.*;
 
 /**
  *
  * @author vens
  */
 public class Main {
+    //private final String USER_AGENT = "Mozilla/5.0";
+
+
+    
+    
+    
     /**
      * @param args the command line arguments
-     * @throws java.lang.Exception
      */
     public static void main(String[] args) throws Exception {
-        JsonReader reader = Json.createReader();
-        
         
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -38,36 +43,20 @@ public class Main {
         }
         
         ReportsDirectory reportsDir = new ReportsDirectory(scoreSystemPath);
-        //reportsDir.proccessEvents();
+        reportsDir.proccessEvents();
         
-        
-        File teamInfo = new File("/home/vens/Projects/firstinspiresiowa-client/TeamInfo_North_Super_Regional_Kindig.html");
-        TeamInfoFile tif = new TeamInfoFile(teamInfo);
-        
-        String json = "{" + tif.buildJson() + "}";
-        
-        
-        
-        
-        
-        
-        //Server server = new Server("https://firstinspiresiowa.firebaseapp.com");
-        Server server = new Server("http://localhost:5000");
-        server.Post(json, "/teams");
-        
-        sleep(10000);
-        System.out.println("continue");
-        ArrayList<JsonAble> teams = tif.onFileChange();
-        json = "{" + JsonAble.buildJsonArray("teams", teams) + "}";
-        
-        server.Post(json, "/teams");
-        
+        /*
         if(true)return;
-        /*File matchDetailsFile = new File("MatchResultsDetails_North_Super_Regional_Kindig.html");
+        
+        Main http = new Main();
+        
+        Server server = new Server("https://firstinspiresiowa.firebaseapp.com");
+        
+        File matchDetailsFile = new File("MatchResultsDetails_North_Super_Regional_Kindig.html");
         File teamInfoFile = new File("TeamInfo_North_Super_Regional_Kindig.html");
         File rankingsFile = new File("Rankings_North_Super_Regional_Kindig.html");
         
-       // Element matchDetailsTable = http.getTable(matchDetailsFile);
+        Element matchDetailsTable = http.getTable(matchDetailsFile);
         Element teamInfoTable = http.getTable(teamInfoFile);
         Element rankingsTable = http.getTable(rankingsFile);
         
@@ -90,15 +79,15 @@ public class Main {
         server.Post(matchlist, "/matches");
         
         
-        /*String teamlist = "{\"teams\":[";
+        String teamlist = "{\"teams\":[";
         for (Team t: teams) {
             teamlist += t.BuildJson() + ",";
         }
         teamlist = teamlist.substring(0,teamlist.length()-1);
         teamlist += "]}";
         //System.out.println(teamlist);
-        server.Post(teamlist, "/teams");*/
-    
+        server.Post(teamlist, "/teams");
+    */
     }
     
     

@@ -12,8 +12,8 @@ import org.jsoup.select.*;
  *
  * @author vens
  */
-public class Match extends JsonAble {
-    private class Aliance extends JsonAble{
+public class Match implements JsonAble {
+    private class Aliance implements JsonAble{
         public int team1;
         public int team2;
         public int team3 = 0;
@@ -40,7 +40,7 @@ public class Match extends JsonAble {
         }
         
         @Override
-        public String buildJson() {
+        public String BuildJson() {
             String j = "{";
             j += "\"teams\": [\"" + team1 + "\",\"" + team2 + (team3>0 ? "\",\"" + team3 : "") +"\"],";
             j += "\"auto\":\"" + auto + "\",";
@@ -107,13 +107,13 @@ public class Match extends JsonAble {
     }
     
     @Override
-    public String buildJson() {
+    public String BuildJson() {
         String j = "{";
         j += "\"number\":\"" + number + "\",";
         j += "\"name\":\""+ name +"\",";
         j += "\"event\":\""+ event_ref +"\",";
-        j += red.buildJson("red") + ",";
-        j += blue.buildJson("blue");
+        j += "\"red\":" + red.BuildJson() + ",";
+        j += "\"blue\":" + blue.BuildJson();
         j += "}";
         return j;
     }
