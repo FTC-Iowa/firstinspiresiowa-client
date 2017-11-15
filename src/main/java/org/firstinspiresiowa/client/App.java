@@ -38,13 +38,12 @@ public class App {
         // create the server
         server = new Server(config.getServer());
         
-        // create root directory object
-        rootDirectory = new RootDirectory(config.getRootDir());
-        
-        
         // open the reports directory to watch for changes
         //fileWatcher = new FileWatcher(config.getRootDir());
         fileWatcher = new DirWatcher();
+        
+        // create root directory object
+        rootDirectory = new RootDirectory(config.getRootDir());
         
         fileWatcher.register(rootDirectory);
     }

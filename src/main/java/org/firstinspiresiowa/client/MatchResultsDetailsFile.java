@@ -6,7 +6,7 @@
 package org.firstinspiresiowa.client;
 
 import java.io.File;
-import java.util.ArrayList;
+import org.json.simple.JSONObject;
 
 /**
  *
@@ -19,8 +19,14 @@ class MatchResultsDetailsFile extends ReportFile {
     }
 
     @Override
-    public ArrayList<Jsonable> onFileChange() throws Exception {
+    public JSONObject onFileChange() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public JSONObject getServerData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     
 }
