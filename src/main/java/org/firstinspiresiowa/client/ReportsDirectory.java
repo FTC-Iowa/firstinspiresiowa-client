@@ -5,75 +5,80 @@
  */
 package org.firstinspiresiowa.client;
 
-import java.io.IOException;
-import static java.nio.file.StandardWatchEventKinds.*;
-import java.nio.file.*;
+import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.simple.JSONObject;
 
 /**
  *
  * @author vens
  */
-public class ReportsDirectory {
-    private final WatchService watcher;
-    private final Map<WatchKey,Path> keys;
+public class ReportsDirectory implements DirectoryEvents {
+    private final File dirFile;
     
-    static <T> WatchEvent<T> cast(WatchEvent<?> event) {
-        return (WatchEvent<T>)event;
+    private final Map<Path,ReportFile> fileMap;
+    
+    
+    public ReportsDirectory(File rootDir) {
+        dirFile = new File(rootDir, "reports");
+        fileMap = new HashMap<>();
     }
     
-    private void register(Path dir) throws IOException {
-        WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-        keys.put(key, dir);
+    public boolean exists() {
+        return dirFile.exists();
     }
-    
-    public ReportsDirectory (Path dir) throws IOException {
-        this.watcher = FileSystems.getDefault().newWatchService();
-        this.keys = new HashMap<WatchKey,Path>();
-        
-        register(dir);
+
+    @Override
+    public File getDirFile() {
+        return this.dirFile;
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    public void proccessEvents() {
-        for (;;) {
-            WatchKey key;
+
+    @Override
+    public void onFileCreate(Path path) {
+        String name = path.getFileName().toString();
+        System.out.println("report File " + path.toAbsolutePath().toString() + " created");
+        if (name.startsWith("TeamInfo")) {
             try {
-                key = watcher.take();
-            } catch (InterruptedException x) {
-                return;
-            }
-            
-            Path dir = keys.get(key);
-            if (dir == null) {
-                System.err.println("WatchKey not recognized!!");
-                continue;
-            }
-            
-            for (WatchEvent<?> event : key.pollEvents()) {
-                WatchEvent.Kind kind = event.kind();
-                
-                if (kind == OVERFLOW) {
-                    continue;
+                TeamInfoFile file = new TeamInfoFile(path.toFile());
+                fileMap.put(path, file);
+                JSONObject json = file.getServerData();
+                if (json != null) {
+                    App.app.server.Post(json, "/teams");
                 }
-                
-                // Context for directory entry event is the file name of entry
-                WatchEvent<Path> ev = cast(event);
-                Path name = ev.context();
-                Path child = dir.resolve(name);
-                
-                // print out event
-                System.out.format("%s: %s\n", event.kind().name(), child);
+            } catch (Exception ex) {
+                Logger.getLogger(ReportsDirectory.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            boolean valid = key.reset();
-            if (!valid) {
-                keys.remove(key);
-                if(keys.isEmpty()) {
-                    break;
+        }
+        
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onFileDelete(Path path) {
+        System.out.println("report File " + path + " deleted");
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onFileModify(Path path) {
+        ReportFile file = fileMap.get(path);
+        if(file != null) {
+            JSONObject changes = file.onFileChange();
+            if (changes != null) {
+                try {
+                    App.app.server.Post(changes, "/teams");
+                } catch (Exception ex) {
+                    Logger.getLogger(ReportsDirectory.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
+        System.out.println("report File " + path + " modified");
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

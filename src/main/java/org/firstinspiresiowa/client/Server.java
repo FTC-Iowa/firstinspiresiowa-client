@@ -16,6 +16,8 @@ import org.json.simple.JSONObject;
  * @author vens
  */
 public class Server {
+    public static final String DEFAULT_SERVER = "http://localhost:5000";
+    //public static final String DEFAULT_SERVER = "https://firstinspiresiowa.firebaseapp.com";
     private final String USER_AGENT = "Vens/5.0";
 
     private final String url;

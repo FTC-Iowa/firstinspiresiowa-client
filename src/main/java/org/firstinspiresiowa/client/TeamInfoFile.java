@@ -7,6 +7,8 @@ package org.firstinspiresiowa.client;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.nodes.Element;
@@ -26,8 +28,14 @@ public class TeamInfoFile extends ReportFile {
         firstParseHtmlFile();
     }
     
-    private void firstParseHtmlFile() throws Exception{
-        Element teamInfoTable = this.getHtmlTable();
+    private void firstParseHtmlFile(){
+        Element teamInfoTable;
+        try {
+            teamInfoTable = this.getHtmlTable();
+        } catch (Exception ex) {
+            Logger.getLogger(TeamInfoFile.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        }
         Elements teamInfoRows = teamInfoTable.getElementsByTag("tr");
         for(int i = 1; i< teamInfoRows.size(); i++) {
             Element row = teamInfoRows.get(i);
@@ -41,25 +49,56 @@ public class TeamInfoFile extends ReportFile {
         return teams;
     }
     
+    @Override
+    public JSONObject getServerData() {
+        if(teams.size()>0){
+            JSONArray teamArray = new JSONArray();
+            teams.forEach((t) -> {
+                teamArray.add(t.toJson());
+            });
+            JSONObject json = new JSONObject();
+            json.put("teams", teamArray);
+            return json;
+        } else {
+            return null;
+        }
+    }
+    
     /**
      * Called whenever the file changes on the disk
      * @return A list of teams that have changed between the disk and ram versions of the file.
      * @throws Exception 
      */
     @Override
-    public ArrayList<Jsonable> onFileChange()  throws Exception{
-        Element teamInfoTable = this.getHtmlTable();
+    public JSONObject onFileChange(){
+        ArrayList<Jsonable> array = new ArrayList<>();
+        Element teamInfoTable;
+        try {
+            teamInfoTable = this.getHtmlTable();
+        } catch (Exception ex) {
+            return null;
+        }
         Elements teamInfoRows = teamInfoTable.getElementsByTag("tr");
-        ArrayList<Jsonable> ret = new ArrayList<>();
         for(int i = 1; i< teamInfoRows.size(); i++) {
             Element row = teamInfoRows.get(i);
             Team t = new Team(row);
             if(!t.equals(teams.get(i-1))) {
                 System.out.println("Team " + t.toString() + " changed.");
                 teams.set(i-1, t);
-                ret.add(t);
+                array.add(t);
             }
         }
-        return ret;
+        
+        if(array.size()>0){
+            JSONArray teamArray = new JSONArray();
+            array.forEach((t) -> {
+                teamArray.add(t.toJson());
+            });
+            JSONObject json = new JSONObject();
+            json.put("teams", teamArray);
+            return json;
+        } else {
+            return null;
+        }
     }
 }

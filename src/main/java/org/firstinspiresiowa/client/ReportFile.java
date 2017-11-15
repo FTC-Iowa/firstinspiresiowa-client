@@ -6,7 +6,7 @@
 package org.firstinspiresiowa.client;
 
 import java.io.File;
-import java.util.ArrayList;
+import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -33,7 +33,9 @@ public abstract class ReportFile {
         return tables.first();
     }
     
-    public abstract ArrayList<Jsonable> onFileChange() throws Exception;
+    public abstract JSONObject onFileChange();
+    
+    public abstract JSONObject getServerData();
     
     // report Files:
     //     MatchResultsDetails, Matches, Rankings, TeamInfo
