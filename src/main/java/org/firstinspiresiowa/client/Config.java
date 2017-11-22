@@ -29,7 +29,7 @@ public final class Config {
     /// the config file
     private File cfgFile;
     /// ref that all queries to the server contain to id to this event
-    private String event_ref;
+    private String eventId;
     /// url of the server we are connected to
     private String server;
     /// server passphrase for login credentials
@@ -65,7 +65,7 @@ public final class Config {
             buildConfigInteractive();
             saveConfigFile(cfgFile);
         }
-        System.out.println(event_ref);
+        System.out.println(eventId);
         System.out.println(server);
         System.out.println(passphrase);
         System.out.println(file_sufix);
@@ -76,8 +76,8 @@ public final class Config {
         saveConfigFile(cfgFile);
     }
     
-    public String getEvent_ref() {
-        return event_ref;
+    public String getEventId() {
+        return eventId;
     }
 
     public String getServer() {
@@ -97,7 +97,7 @@ public final class Config {
             FileReader fileReader = new FileReader(file);
             JSONParser parser = new JSONParser();
             JSONObject json = (JSONObject) parser.parse(fileReader);
-            this.event_ref = (String) json.get("event_ref");
+            this.eventId = (String) json.get("event_ref");
             this.server = (String) json.get("server");
             this.passphrase = (String) json.get("passphrase");
             this.file_sufix = (String) json.get("file_sufix");
@@ -109,7 +109,7 @@ public final class Config {
     
     private void saveConfigFile(File file) {
         JSONObject json = new JSONObject();
-        json.put("event_ref", this.event_ref);
+        json.put("event_ref", this.eventId);
         json.put("server", this.server);
         json.put("passphrase", this.passphrase);
         json.put("file_sufix", this.file_sufix);

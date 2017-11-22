@@ -69,8 +69,10 @@ public class Server {
                         }
                     }
                     
+                    obj.put("eventId", App.app.config.getEventId());
+                    
                     try {
-                        server.Post(obj, "/teams");
+                        server.Post(obj, "/update");
                     } catch (IOException ex) {
                         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }

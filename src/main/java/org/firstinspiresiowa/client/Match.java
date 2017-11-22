@@ -13,7 +13,7 @@ import org.jsoup.select.*;
  *
  * @author vens
  */
-public class Match implements Jsonable{
+public final class Match implements Jsonable{
     private class Aliance implements Jsonable{
         public int team1;
         public int team2;
@@ -64,6 +64,7 @@ public class Match implements Jsonable{
     //private final String event_ref;
     private final Aliance red = new Aliance();
     private final Aliance blue = new Aliance();
+    private final int hash;
     
     //<TR ALIGN=CENTER><TD BGCOLOR="#FFFFFF">Q-1</TD><TD BGCOLOR="#FF4444">140-0 R</TD><TD BGCOLOR="#FFFFFF"></TD><TD BGCOLOR="#FFFFFF"></TD><TD BGCOLOR="#FFFFFF">140</TD><TD BGCOLOR="#FFFFFF">90</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">30</TD><TD BGCOLOR="#FFFFFF">20</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD></TR>
     
@@ -86,7 +87,7 @@ public class Match implements Jsonable{
         
         name = cols.get(0).text();
         //event_ref = _event_ref;
-        System.out.println(cols.get(5).text());
+        //System.out.println(cols.get(5).text());
         red.auto = Integer.parseInt(cols.get(5).text());
         red.auto_b = Integer.parseInt(cols.get(6).text());
         red.end_game = Integer.parseInt(cols.get(8).text());
@@ -99,17 +100,10 @@ public class Match implements Jsonable{
         blue.penalty = Integer.parseInt(cols.get(15).text());
         blue.tele_op = Integer.parseInt(cols.get(13).text());
         blue.total = Integer.parseInt(cols.get(10).text());
-    }
-    
-    public boolean equals(Match m) {
-        if (number == m.number &&
-                name.compareTo(m.name) == 0 &&
-                //event_ref.compareTo(m.event_ref) == 0 &&
-                red.equals(m.red) &&
-                blue.equals(m.blue)) {
-            return true;
-        }
-        return false;
+        
+        String tmp = this.toJson().toJSONString();
+        hash = tmp.hashCode();
+        
     }
     
     @Override
@@ -120,5 +114,30 @@ public class Match implements Jsonable{
         json.put("red", red.toJson());
         json.put("blue", blue.toJson());
         return json;
+    }
+    
+    @Override
+    public String toString() {
+        return name;
+    }
+    
+    @Override
+    public int hashCode(){
+        return hash;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Match other = (Match) obj;
+        return this.hash == other.hash;
     }
 }

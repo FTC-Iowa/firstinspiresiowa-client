@@ -94,7 +94,8 @@ public class ReportsDirectory implements DirectoryEvents {
             // get any changes to the file
             JSONObject changes = file.onFileChange();
             // send those changes to the server async
-            App.app.server.QueuePost(changes);
+            if(changes != null)
+                App.app.server.QueuePost(changes);
         }
         System.out.println("report File " + path + " modified");
     }
