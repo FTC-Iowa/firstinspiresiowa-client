@@ -25,20 +25,20 @@ public class RootDirectory implements DirectoryEvents{
         reportsDirectory = new ReportsDirectory(rootDir);
         if (reportsDirectory.exists()) {
             try {
-                App.app.fileWatcher.register(reportsDirectory);
+                App.app.fileWatcher.registerDirectory(reportsDirectory);
             } catch (IOException ex) {
                 Logger.getLogger(RootDirectory.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
-
+    
     @Override
     public void onFileCreate(Path path) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         System.out.println("File " + path + " created");
         if(path.endsWith("reports")){
             try {
-                App.app.fileWatcher.register(reportsDirectory);
+                App.app.fileWatcher.registerDirectory(reportsDirectory);
             } catch (IOException ex) {
                 Logger.getLogger(RootDirectory.class.getName()).log(Level.SEVERE, null, ex);
             }

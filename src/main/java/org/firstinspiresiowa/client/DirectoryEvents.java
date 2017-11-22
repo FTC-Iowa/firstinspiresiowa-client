@@ -12,7 +12,7 @@ import java.nio.file.Path;
  *
  * @author vens
  */
-interface DirectoryEvents {
+public interface DirectoryEvents {
     public File getDirFile();
     public void onFileCreate(Path path);
     public void onFileDelete(Path path);

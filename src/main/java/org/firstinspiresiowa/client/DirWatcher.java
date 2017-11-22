@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * @author vens
  */
-public class DirWatcher {
+public class DirWatcher extends Thread{
     private final WatchService watcher;
     private final Map<WatchKey,Path> keys;
     private final Map<WatchKey,DirectoryEvents> callbacks;
@@ -25,7 +25,7 @@ public class DirWatcher {
         return (WatchEvent<T>)event;
     }
     
-    public void register(DirectoryEvents directory) throws IOException {
+    public void registerDirectory(DirectoryEvents directory) throws IOException {
         File dir = directory.getDirFile();
         WatchKey key = dir.toPath().register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         keys.put(key, dir.toPath());
@@ -42,7 +42,8 @@ public class DirWatcher {
         this.callbacks = new HashMap<>();
     }
     
-    public void proccessEvents() {
+    @Override
+    public void run() {
         for (;;) {
             WatchKey key;
             try {

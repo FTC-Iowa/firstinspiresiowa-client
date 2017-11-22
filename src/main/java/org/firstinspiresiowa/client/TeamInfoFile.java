@@ -22,7 +22,7 @@ public class TeamInfoFile extends ReportFile {
     private final ArrayList<Team> teams;
     //public CollisionManager(ArrayList<? extends JsonAble>) teams;
     
-    public TeamInfoFile(File _file) throws Exception{
+    public TeamInfoFile(File _file){
         super(_file);
         this.teams = new ArrayList<>();
         firstParseHtmlFile();
