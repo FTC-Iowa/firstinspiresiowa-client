@@ -68,39 +68,44 @@ public final class Match implements Jsonable{
     
     //<TR ALIGN=CENTER><TD BGCOLOR="#FFFFFF">Q-1</TD><TD BGCOLOR="#FF4444">140-0 R</TD><TD BGCOLOR="#FFFFFF"></TD><TD BGCOLOR="#FFFFFF"></TD><TD BGCOLOR="#FFFFFF">140</TD><TD BGCOLOR="#FFFFFF">90</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">30</TD><TD BGCOLOR="#FFFFFF">20</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD><TD BGCOLOR="#FFFFFF">0</TD></TR>
     
-    public Match(Element row, int _number){
+    public Match(Element row, int _number) throws NumberFormatException{
         
         Elements cols = row.getElementsByTag("td");
         //System.out.println(cols.size());
         number = _number;
         
-        String[] red_teams = cols.get(2).text().split("\\s");
-        String[] blue_teams = cols.get(3).text().split("\\s");
-        red.team1 = Integer.parseInt(red_teams[0]);
-        red.team2 = Integer.parseInt(red_teams[1]);
-        if (red_teams.length == 3)
-            red.team3 = Integer.parseInt(red_teams[2]);
-        blue.team1 = Integer.parseInt(blue_teams[0]);
-        blue.team2 = Integer.parseInt(blue_teams[1]);
-        if (blue_teams.length == 3)
-            red.team3 = Integer.parseInt(blue_teams[2]);
-        
-        name = cols.get(0).text();
-        //event_ref = _event_ref;
-        //System.out.println(cols.get(5).text());
-        red.auto = Integer.parseInt(cols.get(5).text());
-        red.auto_b = Integer.parseInt(cols.get(6).text());
-        red.end_game = Integer.parseInt(cols.get(8).text());
-        red.penalty = Integer.parseInt(cols.get(9).text());
-        red.tele_op = Integer.parseInt(cols.get(7).text());
-        red.total = Integer.parseInt(cols.get(4).text());
-        blue.auto = Integer.parseInt(cols.get(11).text());
-        blue.auto_b = Integer.parseInt(cols.get(12).text());
-        blue.end_game = Integer.parseInt(cols.get(14).text());
-        blue.penalty = Integer.parseInt(cols.get(15).text());
-        blue.tele_op = Integer.parseInt(cols.get(13).text());
-        blue.total = Integer.parseInt(cols.get(10).text());
-        
+        try {
+            String[] red_teams = cols.get(2).text().split("\\s");
+            String[] blue_teams = cols.get(3).text().split("\\s");
+            red.team1 = Integer.parseInt(red_teams[0]);
+            red.team2 = Integer.parseInt(red_teams[1]);
+            if (red_teams.length == 3)
+                red.team3 = Integer.parseInt(red_teams[2]);
+            blue.team1 = Integer.parseInt(blue_teams[0]);
+            blue.team2 = Integer.parseInt(blue_teams[1]);
+            if (blue_teams.length == 3)
+                red.team3 = Integer.parseInt(blue_teams[2]);
+
+            name = cols.get(0).text();
+            //event_ref = _event_ref;
+            //System.out.println(cols.get(5).text());
+            red.auto = Integer.parseInt(cols.get(5).text());
+            red.auto_b = Integer.parseInt(cols.get(6).text());
+            red.end_game = Integer.parseInt(cols.get(8).text());
+            red.penalty = Integer.parseInt(cols.get(9).text());
+            red.tele_op = Integer.parseInt(cols.get(7).text());
+            red.total = Integer.parseInt(cols.get(4).text());
+            blue.auto = Integer.parseInt(cols.get(11).text());
+            blue.auto_b = Integer.parseInt(cols.get(12).text());
+            blue.end_game = Integer.parseInt(cols.get(14).text());
+            blue.penalty = Integer.parseInt(cols.get(15).text());
+            blue.tele_op = Integer.parseInt(cols.get(13).text());
+            blue.total = Integer.parseInt(cols.get(10).text());
+        } catch (NumberFormatException e) {
+            throw e;
+        }
+            
+            
         String tmp = this.toJson().toJSONString();
         hash = tmp.hashCode();
         

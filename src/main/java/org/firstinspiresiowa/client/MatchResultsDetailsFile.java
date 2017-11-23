@@ -38,8 +38,12 @@ class MatchResultsDetailsFile extends ReportFile {
         Elements rows = table.getElementsByTag("tr");
         for(int i = 2; i< rows.size(); i++) {
             Element row = rows.get(i);
-            Match m = new Match(row, i-2);
-            fileMatches.add(m);
+            try {
+                Match m = new Match(row, i-2);
+                fileMatches.add(m);
+            } catch (Exception e) {
+                
+            }
             //System.out.println("Found match: " + m);
         }
         
@@ -63,7 +67,7 @@ class MatchResultsDetailsFile extends ReportFile {
         }
         if (newMatches.size() > matches.size()) {
             for(;i<newMatches.size(); i++) {
-                    System.out.println("Match " + matches.get(i) + " added");
+                    System.out.println("Match " + newMatches.get(i) + " added");
                 matches.add(newMatches.get(i));
                 changed.add(newMatches.get(i));
             }
