@@ -38,6 +38,8 @@ public final class Config {
     private String file_sufix;
     /// the root directory of the score system.
     private File rootDir;
+    /// the type of event
+    private EventType eventType = EventType.LeagueTournament;
     
     public Config() throws FileNotFoundException{
         rootDir = new File(".");
@@ -101,6 +103,7 @@ public final class Config {
             this.server = (String) json.get("server");
             this.passphrase = (String) json.get("passphrase");
             this.file_sufix = (String) json.get("file_sufix");
+            this.eventType = EventType.valueOf((String)json.get("event_type"));
             //this.directory = FileSystems.getDefault().getPath((String) json.get("directory"));
         } catch (ParseException ex) {
             Logger.getLogger(Config.class.getName()).log(Level.SEVERE, null, ex);
@@ -113,6 +116,7 @@ public final class Config {
         json.put("server", this.server);
         json.put("passphrase", this.passphrase);
         json.put("file_sufix", this.file_sufix);
+        json.put("event_type", this.eventType.toString());
         //json.put("reports_dir", this.directory.toAbsolutePath().toString());
         
         try {
@@ -159,5 +163,9 @@ public final class Config {
         passphrase = (String)JOptionPane.showInputDialog(
                 "Enter server passphase");
         System.out.println(passphrase);
+    }
+
+    public EventType getEventType() {
+        return eventType;
     }
 }
