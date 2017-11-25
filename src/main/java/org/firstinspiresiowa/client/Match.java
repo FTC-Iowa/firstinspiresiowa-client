@@ -13,6 +13,7 @@ import org.jsoup.select.*;
  *
  * @author vens
  */
+@Deprecated
 public final class Match implements Jsonable{
     private class Aliance implements Jsonable{
         public int team1;
@@ -75,6 +76,9 @@ public final class Match implements Jsonable{
         try {
             String[] red_teams = cols.get(2).text().split("\\s");
             String[] blue_teams = cols.get(3).text().split("\\s");
+            if(red_teams[0].endsWith("*")){
+                red_teams[0] = red_teams[0].substring(red_teams[0].length()-1);
+            }
             red.team1 = Integer.parseInt(red_teams[0]);
             red.team2 = Integer.parseInt(red_teams[1]);
             if (red_teams.length == 3)

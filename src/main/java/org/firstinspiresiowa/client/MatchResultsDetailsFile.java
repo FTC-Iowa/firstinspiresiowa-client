@@ -6,7 +6,6 @@
 package org.firstinspiresiowa.client;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
@@ -19,15 +18,107 @@ import org.jsoup.select.Elements;
  * @author vens
  */
 class MatchResultsDetailsFile extends ReportFile {
-    private final ArrayList<Match> matches;
+    private JSONArray matches;
     
     public MatchResultsDetailsFile(File _file) {
         super(_file);
         matches = parseHtmlFile();
     }
     
-    private ArrayList<Match> parseHtmlFile() {
-        ArrayList<Match> fileMatches = new ArrayList<>();
+    private static String trimString(String str) {
+        return str.substring(0, str.length() - 1);
+    }
+    
+    private JSONObject buildAlliance(String teamstring) {
+        JSONObject json = new JSONObject();
+        JSONArray teams = new JSONArray();
+        JSONArray surrogates = new JSONArray();
+        
+        String[] teamArray = teamstring.split("\\s");
+        
+        if(teamArray[0].endsWith("*")) {
+            teamArray[0] = trimString(teamArray[0]);
+            surrogates.add(Integer.parseInt(teamArray[0]));
+        }
+        teams.add(Integer.parseInt(teamArray[0]));
+        
+        if(teamArray[1].endsWith("*")) {
+            teamArray[1] = trimString(teamArray[1]);
+            surrogates.add(Integer.parseInt(teamArray[1]));
+        }
+        teams.add(Integer.parseInt(teamArray[1]));
+        
+        if(teamArray.length > 2) {
+            if(teamArray[2].endsWith("*")) {
+                teamArray[2] = trimString(teamArray[2]);
+                surrogates.add(Integer.parseInt(teamArray[2]));
+            }
+            teams.add(Integer.parseInt(teamArray[2]));
+        }
+        
+        json.put("teams", teams);
+        if(!surrogates.isEmpty()) {
+            json.put("surrogates", surrogates);
+        }
+        
+        return json;
+    }
+    
+    private JSONObject buildAlliance(String teamstring, int tot, int auto, int autob, int tele, int endg, int pen) {
+        JSONObject json = buildAlliance(teamstring);
+        
+        json.put("auto", auto);
+        json.put("auto_b", autob);
+        json.put("end_game", endg);
+        json.put("penalty", pen);
+        json.put("tele_op", tele);
+        json.put("total", tot);
+        
+        return json;
+    }
+    
+    private JSONObject parseRow(Element row, int number) {
+    JSONObject json = new JSONObject();
+        Elements cols = row.getElementsByTag("td");
+        
+        
+        json.put("number", number);
+        json.put("name", cols.get(0).text());
+        
+        JSONObject red, blue;
+        
+        // if this is an empty match
+        if (!cols.get(1).text().contains("-")) {
+            red = buildAlliance (cols.get(2).text());
+            blue = buildAlliance (cols.get(3).text());
+        } else {
+            red = buildAlliance (
+                    cols.get(2).text(),
+                    Integer.parseInt(cols.get(4).text()),
+                    Integer.parseInt(cols.get(5).text()),
+                    Integer.parseInt(cols.get(6).text()),
+                    Integer.parseInt(cols.get(7).text()),
+                    Integer.parseInt(cols.get(8).text()),
+                    Integer.parseInt(cols.get(9).text())                
+                );
+            blue = buildAlliance (
+                    cols.get(3).text(),
+                    Integer.parseInt(cols.get(10).text()),
+                    Integer.parseInt(cols.get(11).text()),
+                    Integer.parseInt(cols.get(12).text()),
+                    Integer.parseInt(cols.get(13).text()),
+                    Integer.parseInt(cols.get(14).text()),
+                    Integer.parseInt(cols.get(15).text())                
+                );
+        }
+        json.put("red", red);
+        json.put("blue", blue);
+        
+        return json;
+    }
+    
+    private JSONArray parseHtmlFile() {
+        JSONArray array = new JSONArray();
         Element table;
         try {
             table = this.getHtmlTable();
@@ -36,105 +127,39 @@ class MatchResultsDetailsFile extends ReportFile {
             return null;
         }
         Elements rows = table.getElementsByTag("tr");
+        
+        if ( rows.size() <= 2 )
+            return null;
+        
         for(int i = 2; i< rows.size(); i++) {
             Element row = rows.get(i);
             try {
-                Match m = new Match(row, i-2);
-                fileMatches.add(m);
+                JSONObject obj = parseRow(row, i-2);
+                array.add(obj);
             } catch (Exception e) {
-                
+                Logger.getLogger(TeamInfoFile.class.getName()).log(Level.SEVERE, null, e);
             }
-            //System.out.println("Found match: " + m);
         }
         
-        return fileMatches;
+        return array;
     }
 
     @Override
     public JSONObject onFileChange() {
-        ArrayList<Match> newMatches = parseHtmlFile();
-        ArrayList<Jsonable> changed = new ArrayList<>();
-        
-        int i = 0;
-        if (matches.size() <= newMatches.size()) {
-            for(i=0;i<matches.size();i++) {
-                if (!matches.get(i).equals(newMatches.get(i))) {
-                    System.out.println("Match " + matches.get(i) + " changed");
-                    matches.set(i, newMatches.get(i));
-                    changed.add(newMatches.get(i));
-                }
-            }
-        }
-        if (newMatches.size() > matches.size()) {
-            for(;i<newMatches.size(); i++) {
-                    System.out.println("Match " + newMatches.get(i) + " added");
-                matches.add(newMatches.get(i));
-                changed.add(newMatches.get(i));
-            }
-        }
-        
-        if(changed.size()>0){
-            JSONArray matchArray = new JSONArray();
-            changed.forEach((m) -> {
-                matchArray.add(m.toJson());
-            });
-            JSONObject json = new JSONObject();
-            json.put("matches", matchArray);
-            return json;
+        JSONArray newMatches = parseHtmlFile();
+        if(newMatches != null && !matches.equals(newMatches)) {
+            matches = newMatches;
+            return getServerData();
         } else {
             return null;
         }
-        
-        
-        //ArrayList<Match> changed = matche
-        
-        
-        
-//        
-//        ArrayList<Jsonable> array = new ArrayList<>();
-//        Element table;
-//        try {
-//            table = this.getHtmlTable();
-//        } catch (Exception ex) {
-//            return null;
-//        }
-//        Elements rows = table.getElementsByTag("tr");
-//        for(int i = 2; i< rows.size(); i++) {
-//            Element row = rows.get(i);
-//            Match m = new Match(row, i-2);
-//            if(!m.equals(matches.get(i-2))) {
-//                System.out.println("Match " + m.toString() + " changed.");
-//                matches.set(i-2, m);
-//                array.add(m);
-//            }
-//        }
-//        
-//        if(array.size()>0){
-//            JSONArray matchArray = new JSONArray();
-//            array.forEach((m) -> {
-//                matchArray.add(m.toJson());
-//            });
-//            JSONObject json = new JSONObject();
-//            json.put("matches", matchArray);
-//            return json;
-//        } else {
-//            return null;
-//        }
     }
 
     @Override
     public JSONObject getServerData() {
-        if(matches.size()>0){
-            JSONArray array = new JSONArray();
-            matches.forEach((i) -> {
-                array.add(i.toJson());
-            });
-            JSONObject json = new JSONObject();
-            json.put("matches", array);
-            return json;
-        } else {
-            return null;
-        }
+        JSONObject json = new JSONObject();
+        json.put("matches", matches);
+        return json;
     }
 
     

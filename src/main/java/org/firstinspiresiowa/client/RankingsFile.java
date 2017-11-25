@@ -6,7 +6,6 @@
 package org.firstinspiresiowa.client;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
@@ -20,6 +19,28 @@ import org.jsoup.select.Elements;
  */
 class RankingsFile extends ReportFile {
 
+    private JSONObject parseRow(Element row) {
+        JSONObject json = new JSONObject();
+        Elements cols = row.getElementsByTag("td");
+        
+        json.put("rank", Integer.parseInt(cols.get(0).text()));
+        json.put("team", Integer.parseInt(cols.get(1).text()));
+        json.put("qp", Integer.parseInt(cols.get(3).text()));
+        json.put("rp", Integer.parseInt(cols.get(4).text()));
+        json.put("highest", Integer.parseInt(cols.get(5).text()));
+        json.put("matches", Integer.parseInt(cols.get(6).text()));
+        if (cols.size() > 7) {
+            JSONObject league = new JSONObject();
+            league.put("qp", Integer.parseInt(cols.get(7).text()));
+            league.put("rp", Integer.parseInt(cols.get(8).text()));
+            league.put("matches", Integer.parseInt(cols.get(9).text()));
+            json.put("league", league);
+        }
+        
+        return json;
+    }
+
+    @Deprecated
     private class Ranking implements Jsonable{
         private final int rank;
         private final int teamNumber;
@@ -98,8 +119,9 @@ class RankingsFile extends ReportFile {
         }
     }
     
-    private ArrayList<Ranking> rankings;
+    //private ArrayList<Ranking> rankings;
     private final boolean isLeague;
+    private JSONArray rankings;
     
     public RankingsFile(File _file) {
         super(_file);
@@ -108,8 +130,8 @@ class RankingsFile extends ReportFile {
     }
 
    
-    private ArrayList<Ranking> parseHtmlFile() {
-        ArrayList<Ranking> fileRankings = new ArrayList<>();
+    private JSONArray parseHtmlFile() {
+        JSONArray json = new JSONArray();
         Element table;
         try {
             table = this.getHtmlTable();
@@ -121,39 +143,38 @@ class RankingsFile extends ReportFile {
         
         int i = isLeague ? 2 : 1;
         
+        if(rows.size() <= i)
+            return null;
+        
         for(; i< rows.size(); i++) {
             Element row = rows.get(i);
             try {
-                Ranking m = new Ranking(row, isLeague);
-                fileRankings.add(m);
+                JSONObject rank = parseRow(row);
+                json.add(rank);
             } catch (Exception e) {
                 
             }
-            //System.out.println("Found match: " + m);
         }
         
-        return fileRankings;
+        return json;
     }
 
     @Override
     public JSONObject getServerData() {
-        if(rankings.size()>0){
-            JSONArray array = new JSONArray();
-            rankings.forEach((i) -> {
-                array.add(i.toJson());
-            });
-            JSONObject json = new JSONObject();
-            json.put("rankings", array);
-            return json;
-        } else {
-            return null;
-        }
+        JSONObject json = new JSONObject();
+        json.put("rankings", rankings);
+        return json;
     }
 
     @Override
     public JSONObject onFileChange() {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        return null;
+        JSONArray array = parseHtmlFile();
+        if ( array != null && !array.equals(rankings)) {
+            rankings = array;
+            return getServerData();
+        } else {
+            return null;
+        }
     }
     
 }
